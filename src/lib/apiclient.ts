@@ -1,5 +1,6 @@
 // lib/apiClient.ts
-const API_BASE_URL = "http://localhost:8000"; // Change for production
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND|| "http://localhost:8000";
+ // Change for production
 
 export const apiClient = {
   async get<T>(path: string): Promise<T> {
