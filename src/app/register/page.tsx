@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -16,18 +16,30 @@ export default function RegisterPage() {
       localStorage.setItem('token', res.data.access_token);
       alert('Registration successful');
       router.push('/');
-    } catch (err: any) {
-      if (err.response) {
-        alert(`Registration failed: ${err.response.data.detail || 'Unknown error'}`);
-      } else if (err.request) {
-        alert('Registration failed: No response from server');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          alert(`Registration failed: ${error.response.data.detail || 'Unknown error'}`);
+        } else if (error.request) {
+          alert('Registration failed: No response from server');
+        } else {
+          alert('Registration failed: ' + error.message);
+        }
       } else {
-        alert('Registration failed: ' + err.message);
+        alert('Registration failed: Unknown error');
       }
-      console.error(err);
+      console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
   return (
@@ -35,7 +47,7 @@ export default function RegisterPage() {
       {/* Background pattern */}
       <div className="absolute inset-0 z-0">
         <div
-          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40%)]"
+          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40)]"
           style={{ backgroundSize: 'cover' }}
         ></div>
       </div>
@@ -51,14 +63,14 @@ export default function RegisterPage() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={onEmailChange}
             className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={onPasswordChange}
             className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
           <button

@@ -20,7 +20,7 @@ export default function UploadPage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessage(`✅ ${response.data.message}`);
-    } catch (err) {
+    } catch  {
       setMessage('❌ Upload failed');
     }
   };

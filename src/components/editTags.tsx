@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-export default function EditTags({ docId, existingTags }: { docId: number; existingTags: string[] }) {
+export default function EditTags({ docId, existingTags }: { docId: string; existingTags: string[] }) {
   const [tags, setTags] = useState(existingTags.join(', '));
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);

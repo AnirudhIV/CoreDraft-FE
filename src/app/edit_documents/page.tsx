@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import Navbar from '@/components/navbar';
@@ -8,7 +8,7 @@ import Navbar from '@/components/navbar';
 interface DecodedToken {
   sub?: string;
   username?: string;
-  role?: string; // <-- added role field
+  role?: string;
   exp?: number;
 }
 
@@ -29,7 +29,7 @@ export default function EditDocumentsPage() {
   const [file, setFile] = useState<File | null>(null);
   const [editingDoc, setEditingDoc] = useState<Document | null>(null);
   const [editContent, setEditContent] = useState('');
-  const [userRole, setUserRole] = useState<string | null>(null); // <-- track role
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -46,7 +46,7 @@ export default function EditDocumentsPage() {
         return;
       }
       setIsAuth(true);
-      setUserRole(decoded.role || null); // <-- save role
+      setUserRole(decoded.role || null);
     } catch {
       localStorage.removeItem('token');
       router.push('/login');
@@ -55,7 +55,7 @@ export default function EditDocumentsPage() {
     }
   }, [router]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     if (!isAuth) return;
     setFetchingDocs(true);
     try {
@@ -71,27 +71,11 @@ export default function EditDocumentsPage() {
     } finally {
       setFetchingDocs(false);
     }
-  };
+  }, [isAuth]);
 
   useEffect(() => {
     fetchDocuments();
-  }, [isAuth]);
-
-  const handleSetDefault = async (id: string) => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`/api/documents/${id}/set_default`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error('Failed to set default document');
-      setDocuments((prev) =>
-        prev.map((doc) => ({ ...doc, is_default: doc.id === id }))
-      );
-    } catch (err) {
-      console.error('❌ Error setting default document:', err);
-    }
-  };
+  }, [fetchDocuments]);
 
   const handleUpload = async () => {
     if (!file) return;
@@ -112,6 +96,22 @@ export default function EditDocumentsPage() {
       console.error('❌ Error uploading file:', err);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleSetDefault = async (id: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`/api/documents/${id}/set_default`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Failed to set default document');
+      setDocuments((prev) =>
+        prev.map((doc) => ({ ...doc, is_default: doc.id === id }))
+      );
+    } catch (err) {
+      console.error('❌ Error setting default document:', err);
     }
   };
 
@@ -176,7 +176,7 @@ export default function EditDocumentsPage() {
       {/* Gradient background */}
       <div className="absolute inset-0 z-0">
         <div
-          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40%)]"
+          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40)]"
         ></div>
       </div>
 
@@ -191,8 +191,8 @@ export default function EditDocumentsPage() {
           Manage Documents
         </h1>
         <p className="text-center text-gray-400 mb-8">
-  Note: The current maximum number of documents a user can upload for accurate answers is <span className="font-semibold text-pink-400">3</span>.
-</p>
+          Note: The current maximum number of documents a user can upload for accurate answers is <span className="font-semibold text-pink-400">3</span>.
+        </p>
 
         {/* Upload Section */}
         <div className="mb-8 bg-gray-800/50 backdrop-blur-lg border border-gray-700/50 rounded-2xl p-6 shadow-xl hover:shadow-pink-400/20 transition">
@@ -232,7 +232,6 @@ export default function EditDocumentsPage() {
                   {doc.is_default && <span className="text-green-400 font-semibold">(Default)</span>}
                 </span>
                 <div className="flex gap-2">
-                  {/* Only show "Set as Default" if user is admin */}
                   {userRole === 'admin' && !doc.is_default && (
                     <button
                       className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg transition"

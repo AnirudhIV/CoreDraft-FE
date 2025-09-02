@@ -1,5 +1,5 @@
-// app/documents/[id]/page.tsx
 'use client';
+
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
@@ -8,18 +8,35 @@ import { useAuth } from '@/components/useauth';
 import EditTags from '@/components/editTags';
 import SummaryBox from '@/components/SummaryBox';
 
+// Define the type for your document data
+interface DocumentData {
+  id: string;
+  title: string;
+  type: string;
+  tags: string[];
+  content: string;
+}
+
 export default function DocumentDetailPage() {
   useAuth();
   const { id } = useParams();
-  const [doc, setDoc] = useState<any>(null);
+  const [doc, setDoc] = useState<DocumentData | null>(null);
 
   useEffect(() => {
     const fetchDoc = async () => {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8000/compliance/documents/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDoc(res.data);
+      try {
+        if (!id) return;
+        const res = await axios.get<DocumentData>(
+          `http://localhost:8000/compliance/documents/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setDoc(res.data);
+      } catch (err) {
+        console.error('Failed to fetch document:', err);
+      }
     };
     fetchDoc();
   }, [id]);

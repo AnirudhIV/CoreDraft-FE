@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
@@ -15,18 +15,30 @@ export default function LoginPage() {
       const response = await axios.post('http://localhost:8000/auth/login', { email, password });
       localStorage.setItem('token', response.data.access_token);
       router.push('/');
-    } catch (err: any) {
-      if (err.response) {
-        alert(`Login failed: ${err.response.data.detail || 'Unknown error'}`);
-      } else if (err.request) {
-        alert('Login failed: No response from server');
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          alert(`Login failed: ${error.response.data.detail || 'Unknown error'}`);
+        } else if (error.request) {
+          alert('Login failed: No response from server');
+        } else {
+          alert('Login failed: ' + error.message);
+        }
       } else {
-        alert('Login failed: ' + err.message);
+        alert('Login failed: Unknown error occurred');
       }
-      console.error(err);
+      console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const onEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const onPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
   return (
@@ -50,14 +62,14 @@ export default function LoginPage() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={onEmailChange}
             className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={onPasswordChange}
             className="bg-slate-800/70 border border-slate-700 rounded-lg p-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
           />
           <button

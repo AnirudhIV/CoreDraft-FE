@@ -8,7 +8,7 @@ export default function LogoutPage() {
   useEffect(() => {
     localStorage.removeItem('token');
     router.push('/login');
-  }, []);
+  }, [router]);
 
   return <p className="p-6">Logging out...</p>;
 }

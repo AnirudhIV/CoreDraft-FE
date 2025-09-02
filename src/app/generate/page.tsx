@@ -1,16 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import Navbar from '@/components/navbar';
 import { useAuth } from '@/components/useauth';
+
+interface GeneratedDocument {
+  title?: string;
+  tags?: string[];
+  content?: string;
+}
+
+interface GenerateResponse {
+  error?: string;
+  saved?: boolean;
+  document_id?: string | number;
+  document?: GeneratedDocument;
+}
 
 export default function GeneratePage() {
   useAuth();
 
   const [prompt, setPrompt] = useState('');
   const [type, setType] = useState('');
-  const [response, setResponse] = useState<any>(null);
+  const [response, setResponse] = useState<GenerateResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
@@ -19,18 +32,25 @@ export default function GeneratePage() {
     setResponse(null);
 
     try {
-      const res = await axios.post(
+      const res = await axios.post<GenerateResponse>(
         'http://localhost:8000/compliance/generate',
         { prompt, type },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setResponse(res.data);
-    } catch (err: any) {
+    } catch  {
       setResponse({ error: '❌ Error generating document' });
     } finally {
       setLoading(false);
     }
+  };
+
+  const onPromptChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value);
+  };
+  const onTypeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setType(e.target.value);
   };
 
   return (
@@ -38,7 +58,7 @@ export default function GeneratePage() {
       {/* Gradient background (same as other pages) */}
       <div className="absolute inset-0 z-0">
         <div
-          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40%)]"
+          className="w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(255,0,255,0.15),transparent_40%),radial-gradient(circle_at_80%_70%,rgba(0,255,255,0.15),transparent_40)]"
         ></div>
       </div>
 
@@ -49,37 +69,40 @@ export default function GeneratePage() {
 
       {/* Glassy card */}
       <div className="relative z-10 flex-1 flex justify-center items-start px-6 py-10">
-        <div className="w-full max-w-3xl bg-slate-800/50 border border-slate-700/50 
-                        rounded-2xl shadow-xl backdrop-blur-lg p-8 
-                        hover:shadow-pink-400/20 transition">
-          
+        <div
+          className="w-full max-w-3xl bg-slate-800/50 border border-slate-700/50 
+                      rounded-2xl shadow-xl backdrop-blur-lg p-8 
+                      hover:shadow-pink-400/20 transition"
+        >
           {/* Heading */}
-          <h2 className="text-2xl font-bold mb-6 text-center 
-                         bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-400 
-                         bg-clip-text text-transparent">
+          <h2
+            className="text-2xl font-bold mb-6 text-center 
+                      bg-gradient-to-r from-pink-400 via-fuchsia-400 to-purple-400 
+                      bg-clip-text text-transparent"
+          >
             Generate Compliance Document
           </h2>
 
           {/* Prompt textarea */}
           <textarea
             className="w-full bg-slate-900/60 border border-slate-700/60 rounded-lg 
-                       p-4 mb-5 resize-none shadow-sm backdrop-blur-sm
-                       focus:outline-none focus:ring-2 focus:ring-pink-500 
-                       text-gray-200 placeholder-gray-400"
+                      p-4 mb-5 resize-none shadow-sm backdrop-blur-sm
+                      focus:outline-none focus:ring-2 focus:ring-pink-500 
+                      text-gray-200 placeholder-gray-400"
             rows={5}
             placeholder="Enter a prompt (e.g., Generate a privacy policy for a fintech startup in India)"
-            onChange={e => setPrompt(e.target.value)}
+            onChange={onPromptChange}
             value={prompt}
           />
 
           {/* Type input */}
           <input
             className="w-full bg-slate-900/60 border border-slate-700/60 rounded-lg 
-                       p-4 mb-5 shadow-sm backdrop-blur-sm
-                       focus:outline-none focus:ring-2 focus:ring-pink-500 
-                       text-gray-200 placeholder-gray-400"
+                      p-4 mb-5 shadow-sm backdrop-blur-sm
+                      focus:outline-none focus:ring-2 focus:ring-pink-500 
+                      text-gray-200 placeholder-gray-400"
             placeholder="Document Type (e.g., Privacy Policy)"
-            onChange={e => setType(e.target.value)}
+            onChange={onTypeChange}
             value={type}
           />
 
@@ -88,16 +111,18 @@ export default function GeneratePage() {
             onClick={handleGenerate}
             disabled={loading}
             className="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-600 
-                       text-white font-medium px-6 py-3 rounded-xl shadow-md 
-                       hover:brightness-110 transition-all disabled:opacity-50"
+                      text-white font-medium px-6 py-3 rounded-xl shadow-md 
+                      hover:brightness-110 transition-all disabled:opacity-50"
           >
             {loading ? 'Generating...' : 'Generate'}
           </button>
 
           {/* Response display */}
           {response && (
-            <div className="mt-6 p-5 bg-slate-900/70 border border-slate-700/60 
-                            rounded-lg shadow-inner backdrop-blur-md">
+            <div
+              className="mt-6 p-5 bg-slate-900/70 border border-slate-700/60 
+                        rounded-lg shadow-inner backdrop-blur-md"
+            >
               {response.error ? (
                 <p className="text-red-400">{response.error}</p>
               ) : (
@@ -109,13 +134,13 @@ export default function GeneratePage() {
 
                   {/* Title */}
                   <p className="mt-3 text-xl font-bold text-white">
-                    {response.document?.title}
+                    {response.document?.title ?? ''}
                   </p>
 
                   {/* Tags */}
-                  {response.document?.tags?.length > 0 && (
+                  {response.document?.tags?.length ? (
                     <div className="mt-2 flex flex-wrap gap-2">
-                      {response.document.tags.map((tag: string, idx: number) => (
+                      {response.document.tags.map((tag, idx) => (
                         <span
                           key={idx}
                           className="px-2 py-1 text-xs bg-pink-600/30 border border-pink-500 rounded-lg text-pink-200"
@@ -124,11 +149,11 @@ export default function GeneratePage() {
                         </span>
                       ))}
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Content */}
                   <p className="mt-4 whitespace-pre-wrap text-gray-200 leading-relaxed">
-                    {response.document?.content}
+                    {response.document?.content ?? ''}
                   </p>
                 </>
               )}

@@ -1,22 +1,28 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import axios from 'axios';
 import Navbar from '@/components/navbar';
 import { useAuth } from '@/components/useauth';
 
+interface Source {
+  // Define the shape of your source object more precisely if you know it
+  title?: string;
+  [key: string]: unknown;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
-  sources?: any[];
+  sources?: Source[];
 }
 
 export default function AskPage() {
   useAuth();
 
-  const [question, setQuestion] = useState('');
+  const [question, setQuestion] = useState<string>('');
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showSources, setShowSources] = useState<{ [idx: number]: boolean }>({});
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -57,14 +63,15 @@ export default function AskPage() {
     setQuestion('');
 
     try {
-      const response = await axios.post(
+      const response = await axios.post<{ answer: string; sources: Source[] }>(
         'http://localhost:8000/compliance/ask',
         { question },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      const newAnswer: string = response.data.answer;
-      const newSources: any[] = response.data.sources || [];
+      // Extract typed values
+      const newAnswer = response.data.answer;
+      const newSources = response.data.sources || [];
 
       // Add assistant reply
       const newAssistantMessage: Message = {
@@ -85,11 +92,15 @@ export default function AskPage() {
     }
   };
 
-  const toggleSources = (idx: number) => {
+  const toggleSources = (idx: number): void => {
     setShowSources((prev) => ({
       ...prev,
-      [idx]: !prev[idx]
+      [idx]: !prev[idx],
     }));
+  };
+
+  const onQuestionChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
+    setQuestion(e.target.value);
   };
 
   return (
@@ -106,9 +117,11 @@ export default function AskPage() {
 
       {/* Chat Container */}
       <div className="relative z-10 flex-1 flex flex-col max-w-3xl mx-auto w-full p-6">
-        <div className="flex-1 overflow-y-auto space-y-4 p-6 rounded-2xl 
+        <div
+          className="flex-1 overflow-y-auto space-y-4 p-6 rounded-2xl 
           bg-slate-800/70 backdrop-blur-md shadow-inner border border-slate-700/60 
-          scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900">
+          scrollbar-thin scrollbar-thumb-purple-600 scrollbar-track-gray-900"
+        >
           {messages.map((msg, idx) => (
             <div
               key={idx}
@@ -167,7 +180,7 @@ export default function AskPage() {
             rows={3}
             placeholder="Enter your question..."
             value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            onChange={onQuestionChange}
           />
           <button
             onClick={handleAsk}

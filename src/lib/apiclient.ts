@@ -2,17 +2,20 @@
 const API_BASE_URL = "http://localhost:8000"; // Change for production
 
 export const apiClient = {
-  async get(path: string) {
+  async get<T>(path: string): Promise<T> {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_BASE_URL}${path}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return res.json();
+    if (!res.ok) {
+      throw new Error(`GET request failed with status ${res.status}`);
+    }
+    return res.json() as Promise<T>;
   },
 
-  async post(path: string, body: any) {
+  async post<T, B>(path: string, body: B): Promise<T> {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_BASE_URL}${path}`, {
       method: "POST",
@@ -22,10 +25,13 @@ export const apiClient = {
       },
       body: JSON.stringify(body),
     });
-    return res.json();
+    if (!res.ok) {
+      throw new Error(`POST request failed with status ${res.status}`);
+    }
+    return res.json() as Promise<T>;
   },
 
-  async upload(path: string, file: File) {
+  async upload<T>(path: string, file: File): Promise<T> {
     const token = localStorage.getItem("token");
     const formData = new FormData();
     formData.append("file", file);
@@ -37,7 +43,9 @@ export const apiClient = {
       },
       body: formData,
     });
-
-    return res.json();
+    if (!res.ok) {
+      throw new Error(`Upload request failed with status ${res.status}`);
+    }
+    return res.json() as Promise<T>;
   },
 };
