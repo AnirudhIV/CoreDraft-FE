@@ -4,7 +4,53 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, run the development server:
 
-```bash
+
+Compliance Copilot 🛡️🤖
+
+Compliance Copilot is an AI-powered assistant that helps organizations streamline compliance tasks, reduce risk, and ensure adherence to regulatory frameworks (GDPR, HIPAA, SOC 2, ISO, etc.).
+
+It combines RAG (Retrieval-Augmented Generation) with large language models to deliver accurate, auditable, and explainable compliance answers, document analysis, and workflow automation.
+
+✨ Features
+
+📑 Policy & Regulation Q&A — Ask compliance-related questions and get precise, cited answers.
+
+🔎 Document Analysis — Upload policies, audit reports, or contracts and let Copilot extract obligations, risks, and gaps.
+
+✅ Compliance Checklists — Auto-generate tailored checklists for standards like GDPR, HIPAA, or ISO 27001.
+
+📊 Risk Insights Dashboard — Summarized view of compliance health across teams/projects.
+
+🔐 Explainable AI — Sources and justifications are always cited for audit readiness.
+
+🛠️ Custom Integrations — Plug into Slack, Jira, Confluence, or internal compliance tools.
+
+🏗️ Architecture
+
+Compliance Copilot is built with:
+
+Frontend: Next.js + TailwindCSS + shadcn/ui
+
+Backend: FastAPI (Python)
+
+Database: PostgreSQL (compliance data, audit logs, caching)
+
+AI Layer: RAG pipeline with vector database (Pinecone / Weaviate / pgvector) + LLM (OpenAI / Anthropic)
+
+Deployment: Docker + AWS (ECS / EKS)
+
+🚀 Getting Started
+Prerequisites
+
+Node.js (v18+)
+
+Python 3.10+
+
+PostgreSQL
+
+Docker (optional but recommended)
+
+API keys (LLM provider, vector DB, etc.) in .env file```bash
 npm run dev
 # or
 yarn dev
