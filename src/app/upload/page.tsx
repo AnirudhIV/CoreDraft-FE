@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState('');
@@ -15,7 +17,7 @@ export default function UploadPage() {
 
     try {
       const response = await axios.post(
-        'http://localhost:8000/compliance/upload',
+        `${API_BASE_URL}/compliance/upload`,
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

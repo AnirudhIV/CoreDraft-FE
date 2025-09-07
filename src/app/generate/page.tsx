@@ -5,6 +5,8 @@ import axios from 'axios';
 import Navbar from '@/components/navbar';
 import { useAuth } from '@/components/useauth';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 interface GeneratedDocument {
   title?: string;
   tags?: string[];
@@ -33,7 +35,7 @@ export default function GeneratePage() {
 
     try {
       const res = await axios.post<GenerateResponse>(
-        'http://localhost:8000/compliance/generate',
+        `${API_BASE_URL}/compliance/generate`,
         { prompt, type },
         { headers: { Authorization: `Bearer ${token}` } }
       );

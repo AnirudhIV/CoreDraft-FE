@@ -3,6 +3,8 @@ import { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +14,7 @@ export default function RegisterPage() {
   const handleRegister = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:8000/auth/register', { email, password });
+      const res = await axios.post(`${API_BASE_URL}/auth/register`, { email, password });
       localStorage.setItem('token', res.data.access_token);
       alert('Registration successful');
       router.push('/');

@@ -5,6 +5,8 @@ import Navbar from '@/components/navbar';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 // Define the document interface for type safety
 interface Document {
   id: number;
@@ -23,7 +25,7 @@ export default function DocumentsPage() {
   const fetchFilteredDocs = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get<Document[]>(`http://localhost:8000/compliance/filter`, {
+      const res = await axios.get<Document[]>(`${API_BASE_URL}/compliance/filter`, {
         params: {
           tag: filterTag || undefined,
           type: filterType || undefined,
@@ -39,7 +41,7 @@ export default function DocumentsPage() {
   const fetchDocs = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await axios.get<Document[]>('http://localhost:8000/compliance/documents', {
+      const res = await axios.get<Document[]>(`${API_BASE_URL}/compliance/documents`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDocuments(res.data);
@@ -51,7 +53,7 @@ export default function DocumentsPage() {
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:8000/compliance/documents/${id}`, {
+      await axios.delete(`${API_BASE_URL}/compliance/documents/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchDocs();

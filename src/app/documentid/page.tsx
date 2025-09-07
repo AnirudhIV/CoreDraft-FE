@@ -8,6 +8,8 @@ import { useAuth } from '@/components/useauth';
 import EditTags from '@/components/editTags';
 import SummaryBox from '@/components/SummaryBox';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 // Define the type for your document data
 interface DocumentData {
   id: string;
@@ -28,7 +30,7 @@ export default function DocumentDetailPage() {
       try {
         if (!id) return;
         const res = await axios.get<DocumentData>(
-          `http://localhost:8000/compliance/documents/${id}`,
+          `${API_BASE_URL}/compliance/documents/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

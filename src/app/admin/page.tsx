@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import Navbar from '@/components/navbar';
 
+// ✅ Use env variable instead of localhost
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 interface DecodedToken {
   role?: string;
   exp?: number;
@@ -49,7 +52,7 @@ export default function AdminDashboard() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/admin/users', {
+      const res = await fetch(`${API_BASE_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch users');
@@ -77,7 +80,7 @@ export default function AdminDashboard() {
     }
 
     const token = localStorage.getItem('token');
-    await fetch(`http://localhost:8000/admin/users/${id}/block?block=${block}`, {
+    await fetch(`${API_BASE_URL}/admin/users/${id}/block?block=${block}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -87,7 +90,7 @@ export default function AdminDashboard() {
   // Change role
   const handleChangeRole = async (id: number, role: string) => {
     const token = localStorage.getItem('token');
-    await fetch(`http://localhost:8000/admin/users/${id}/role?role=${role}`, {
+    await fetch(`${API_BASE_URL}/admin/users/${id}/role?role=${role}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -97,7 +100,7 @@ export default function AdminDashboard() {
   // Reset password
   const handleResetPassword = async (id: number) => {
     const token = localStorage.getItem('token');
-    await fetch(`http://localhost:8000/admin/users/${id}/reset-password`, {
+    await fetch(`${API_BASE_URL}/admin/users/${id}/reset-password`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -107,7 +110,7 @@ export default function AdminDashboard() {
   // RAG actions
   const handleResetRAG = async () => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/compliance/rag/reset`, {
+    const res = await fetch(`${API_BASE_URL}/compliance/rag/reset`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -116,7 +119,7 @@ export default function AdminDashboard() {
 
   const handleRAGStatus = async () => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/compliance/rag/status`, {
+    const res = await fetch(`${API_BASE_URL}/compliance/rag/status`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {

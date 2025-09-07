@@ -5,8 +5,10 @@ import axios from 'axios';
 import Navbar from '@/components/navbar';
 import { useAuth } from '@/components/useauth';
 
+// ✅ Define base URL from environment
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 interface Source {
-  // Define the shape of your source object more precisely if you know it
   title?: string;
   [key: string]: unknown;
 }
@@ -38,7 +40,6 @@ export default function AskPage() {
   // Save session history whenever it changes (per tab)
   useEffect(() => {
     sessionStorage.setItem('ask_chat', JSON.stringify(messages));
-    // Reset all sources visibility when any change (new question)
     setShowSources({});
   }, [messages]);
 
@@ -64,16 +65,14 @@ export default function AskPage() {
 
     try {
       const response = await axios.post<{ answer: string; sources: Source[] }>(
-        'http://localhost:8000/compliance/ask',
+        `${API_BASE_URL}/compliance/ask`,
         { question },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Extract typed values
       const newAnswer = response.data.answer;
       const newSources = response.data.sources || [];
 
-      // Add assistant reply
       const newAssistantMessage: Message = {
         role: 'assistant',
         content: newAnswer,
@@ -134,7 +133,7 @@ export default function AskPage() {
             >
               <p>{msg.content}</p>
 
-              {/* Toggle sources button for assistant messages with sources */}
+              {/* Toggle sources */}
               {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                 <div className="mt-3">
                   <button

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/navbar'; // <-- Import Navbar
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 interface Document {
   id: number;
   title: string;
@@ -22,7 +24,7 @@ export default function SummarizePage() {
   useEffect(() => {
     async function fetchDocs() {
       try {
-        const res = await fetch('http://localhost:8000/compliance/documents', {
+        const res = await fetch(`${API_BASE_URL}/compliance/documents`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -58,7 +60,7 @@ export default function SummarizePage() {
 
     try {
       const res = await fetch(
-        'http://localhost:8000/compliance/ai/summarize',
+        `${API_BASE_URL}/compliance/ai/summarize`,
         {
           method: 'POST',
           headers: {

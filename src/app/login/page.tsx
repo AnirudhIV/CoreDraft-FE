@@ -3,6 +3,8 @@ import { useState, ChangeEvent } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +14,7 @@ export default function LoginPage() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/auth/login', { email, password });
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
       localStorage.setItem('token', response.data.access_token);
       router.push('/');
     } catch (error: unknown) {
@@ -82,7 +84,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-gray-400 text-sm">
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <span
             className="text-purple-400 cursor-pointer hover:underline hover:text-purple-300 transition"
             onClick={() => router.push('/register')}

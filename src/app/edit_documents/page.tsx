@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import Navbar from '@/components/navbar';
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_CORE_DRAFT_BACKEND;
 interface DecodedToken {
   sub?: string;
   username?: string;
@@ -60,7 +60,7 @@ export default function EditDocumentsPage() {
     setFetchingDocs(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/compliance/documents', {
+      const res = await fetch(`${API_BASE_URL}/compliance/documents`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`Failed to fetch documents: ${res.status}`);
@@ -84,7 +84,7 @@ export default function EditDocumentsPage() {
       const token = localStorage.getItem('token');
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('http://localhost:8000/compliance/upload', {
+      const res = await fetch(`${API_BASE_URL}/compliance/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
@@ -102,7 +102,7 @@ export default function EditDocumentsPage() {
   const handleSetDefault = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`/api/documents/${id}/set_default`, {
+      const res = await fetch(`${API_BASE_URL}/compliance/documents/${id}/set_default`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -118,7 +118,7 @@ export default function EditDocumentsPage() {
   const handleDelete = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/compliance/documents/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/compliance/documents/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -132,7 +132,7 @@ export default function EditDocumentsPage() {
   const handleEdit = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/compliance/documents/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/compliance/documents/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch document');
@@ -149,7 +149,7 @@ export default function EditDocumentsPage() {
     try {
       const token = localStorage.getItem('token');
       const res = await fetch(
-        `http://localhost:8000/compliance/documents/${editingDoc.id}`,
+        `${API_BASE_URL}/compliance/documents/${editingDoc.id}`,
         {
           method: 'PUT',
           headers: {
