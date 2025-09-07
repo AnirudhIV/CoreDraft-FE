@@ -84,7 +84,7 @@ export default function LoginPage() {
         </div>
 
         <p className="mt-6 text-center text-gray-400 text-sm">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <span
             className="text-purple-400 cursor-pointer hover:underline hover:text-purple-300 transition"
             onClick={() => router.push('/register')}
